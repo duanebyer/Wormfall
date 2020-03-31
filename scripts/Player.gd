@@ -1,7 +1,5 @@
 extends KinematicBody2D
 
-class_name Player
-
 func _init() -> void:
 	var collision_shape := CollisionShape2D.new();
 	var shape := RectangleShape2D.new();
