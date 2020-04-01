@@ -3,4 +3,5 @@
 [ext_resource path="res://scripts/PixelCamera.gd" type="Script" id=1]
 
 [node name="PixelCamera" type="Camera2D"]
+process_mode = 0
 script = ExtResource( 1 )
