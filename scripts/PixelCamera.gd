@@ -1,7 +1,7 @@
 extends Camera2D
 
-onready var _tree := get_tree()
-onready var _viewport := get_viewport()
+onready var _tree := .get_tree()
+onready var _viewport := .get_viewport()
 onready var _base_size := self._viewport.size
 
 func _ready() -> void:
