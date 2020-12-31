@@ -27,3 +27,8 @@ shape = SubResource( 1 )
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Blocks"]
 position = Vector2( 208, 192 )
 shape = SubResource( 2 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Blocks"]
+position = Vector2( 168, 73.6322 )
+scale = Vector2( 0.17288, 0.527933 )
+polygon = PoolVector2Array( -140.495, -36.7534, 75.5423, 70.1792, 51.5381, 161.806, 260.188, 116.366, 832.948, 284.824, 540.722, 134.444, 375.595, 83.6234, 263.072, 86.9142, 90.5449, 83.6234, 120.55, 16.4026 )
