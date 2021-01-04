@@ -45,6 +45,7 @@ func _process(delta : float) -> void:
 				var item : Node2D = item_area.get_parent()
 				if item is Item:
 					_held_item = item
+					_held_item.held = true
 					_held_item_parent = item.get_parent()
 					item.get_parent().remove_child(_held_item)
 					_hand.add_child(_held_item)
@@ -52,6 +53,7 @@ func _process(delta : float) -> void:
 					break
 		else:
 			var held_item_pos := _held_item.global_position
+			_held_item.held = false
 			_hand.remove_child(_held_item)
 			_held_item_parent.add_child(_held_item)
 			_held_item.global_position = held_item_pos
