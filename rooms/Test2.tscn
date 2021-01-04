@@ -1,21 +1,25 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://entities/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://entities/PixelCamera.tscn" type="PackedScene" id=2]
 [ext_resource path="res://entities/Item.tscn" type="PackedScene" id=3]
-[ext_resource path="res://entities/Door.tscn" type="PackedScene" id=4]
-[ext_resource path="res://rooms/Test2.tscn" type="PackedScene" id=6]
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Node2D
+
+"
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 264, 16 )
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 32, 32 )
+extents = Vector2( 32, 104 )
 
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 24, 72 )
 
 [node name="Test" type="Node2D"]
+script = SubResource( 4 )
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
 position = Vector2( 320, 180 )
@@ -31,13 +35,8 @@ position = Vector2( 320, 240 )
 shape = SubResource( 1 )
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Blocks"]
-position = Vector2( 208, 192 )
+position = Vector2( 88, 120 )
 shape = SubResource( 2 )
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Blocks"]
-position = Vector2( 152, 80 )
-scale = Vector2( 0.17288, 0.527933 )
-polygon = PoolVector2Array( -1156.87, -106.074, -1341.97, -75.7672, -1480.8, -30.3069, -1434.52, 30.3069, -1388.25, 45.4603, -99.7091, 149.584, -46.2749, 257.608, 46.2748, 257.608, 51.5381, 161.806, 260.188, 116.366, 509.024, 151.534, 509.024, 272.762, 971.772, 272.762, 375.595, 83.6234, 263.072, 86.9142, 90.5449, 83.6234, 120.55, 16.4026 )
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="Blocks"]
 position = Vector2( 608, 184 )
@@ -45,7 +44,3 @@ shape = SubResource( 3 )
 
 [node name="Item" parent="." instance=ExtResource( 3 )]
 position = Vector2( 448, 208 )
-
-[node name="Door" parent="." instance=ExtResource( 4 )]
-position = Vector2( 576, 216 )
-leads_to = ExtResource( 6 )
