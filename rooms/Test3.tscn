@@ -1,23 +1,29 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://entities/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://entities/PixelCamera.tscn" type="PackedScene" id=2]
 [ext_resource path="res://entities/Item.tscn" type="PackedScene" id=3]
 [ext_resource path="res://entities/Door.tscn" type="PackedScene" id=4]
 
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 264, 16 )
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+"
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 32, 32 )
+extents = Vector2( 264, 16 )
 
 [sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 120, 16 )
+
+[sub_resource type="RectangleShape2D" id=4]
 extents = Vector2( 24, 72 )
 
 [node name="Test" type="Node2D"]
+script = SubResource( 1 )
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
-position = Vector2( 320, 180 )
+position = Vector2( 544, 192 )
 
 [node name="PixelCamera" parent="Player" instance=ExtResource( 2 )]
 current = true
@@ -28,27 +34,23 @@ collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Blocks"]
 position = Vector2( 320, 240 )
-shape = SubResource( 1 )
+shape = SubResource( 2 )
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Blocks"]
-position = Vector2( 208, 192 )
-shape = SubResource( 2 )
+position = Vector2( -32, 184 )
+shape = SubResource( 3 )
+
+[node name="Door" parent="Blocks/CollisionShape2D2" instance=ExtResource( 4 )]
+position = Vector2( 608, 32 )
+leads_to = "res://rooms/Test.tscn"
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="Blocks"]
 position = Vector2( 608, 184 )
-shape = SubResource( 3 )
+shape = SubResource( 4 )
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Blocks"]
-polygon = PoolVector2Array( 392, 40, 368, 40, 408, 8, 432, 8, 432, 96, 448, 96, 448, 120, 392, 120, 392, 96, 408, 96, 408, 32 )
+position = Vector2( 24, -56 )
+polygon = PoolVector2Array( 216, 40, 232, 24, 288, 24, 304, 40, 304, 72, 272, 88, 304, 96, 304, 128, 288, 152, 232, 152, 216, 136, 232, 128, 248, 136, 272, 136, 280, 120, 280, 104, 248, 96, 248, 72, 280, 64, 280, 40, 240, 40, 224, 64 )
 
 [node name="Item" parent="." instance=ExtResource( 3 )]
 position = Vector2( 448, 208 )
-type = "briefcase"
-
-[node name="Door" parent="." instance=ExtResource( 4 )]
-position = Vector2( 576, 216 )
-leads_to = "res://rooms/Test2.tscn"
-
-[node name="Door2" parent="." instance=ExtResource( 4 )]
-position = Vector2( 248, 216 )
-leads_to = "res://rooms/Test3.tscn"

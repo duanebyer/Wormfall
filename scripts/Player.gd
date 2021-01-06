@@ -1,6 +1,7 @@
 extends KinematicBody2D
 
-const Item := preload("res://scripts/Item.gd")
+const ItemScript := preload("res://scripts/Item.gd")
+const ItemScene := preload("res://entities/Item.tscn")
 const Door := preload("res://scripts/Door.gd")
 
 export var gravity := 500.0
@@ -15,8 +16,12 @@ var _velocity := Vector2.ZERO
 
 onready var _area := $Area2D
 onready var _hand := $Hand
-var _held_item : Item = null
+var _held_item : ItemScript = null
 var _held_item_parent : Node2D = null
+
+var _map_side := "right"
+var _facing_direction := ""
+
 
 func _ready() -> void:
 	pass
@@ -31,32 +36,48 @@ func _physics_process(delta : float) -> void:
 	var move_dir := 0
 	if Input.is_action_pressed("walk_left"):
 		move_dir -= 1
+		_facing_direction = "left"
 	if Input.is_action_pressed("walk_right"):
 		move_dir += 1
+		_facing_direction = "right"
 	self._velocity.x = move_dir * self.walk_speed
 
 	var snap := self._SNAP_DISTANCE * Vector2.DOWN
 	self._velocity = .move_and_slide_with_snap(self._velocity, snap, Vector2.UP, false, self._MAX_SLIDES, self._MAX_SLOPE_ANGLE, true);
 
 func _process(_delta : float) -> void:
-	if Input.is_action_just_pressed("interact"):
+	if Input.is_action_just_pressed("interact") and Input.is_action_pressed("duck"):
 		if _held_item == null: #picking up an item
 			var collision_areas : Array = _area.get_overlapping_areas()
 			var indices = collision_indices(collision_areas)
 			if indices.x >= 0:
-				_pick_up_item(collision_areas[indices.x].get_parent())
-			elif indices.y >= 0:
-				_enter_door(collision_areas[indices.y].get_parent())
+				var item = collision_areas[indices.x].get_parent()
+				if item.can_pick_up:
+					_pick_up_item(item)
 		else: #dropping an item
 			_drop_item()
+	elif Input.is_action_just_pressed("interact"):
+		if _held_item == null: #enter door
+			var collision_areas : Array = _area.get_overlapping_areas()
+			var indices = collision_indices(collision_areas)
+			if indices.y >= 0:
+				_enter_door(collision_areas[indices.y].get_parent())
+		else: #use item
+			_held_item.use_item(_facing_direction)
+			_drop_item()
+			
+	if GameController.switch:
+		GameController.switch = false
+		_switch_stage()
 		
+	
 
 #think of a better way to do this prolly
 func collision_indices(collision_areas) -> Vector2:
 	var output = Vector2(-1, -1)
 	for i in collision_areas.size():
 		var collision : Node2D = collision_areas[i].get_parent()
-		if collision is Item:
+		if collision is ItemScript:
 			output.x = i
 		elif collision is Door:
 			output.y = i
@@ -72,8 +93,22 @@ func _pick_up_item(item) -> void:
 	_hand.add_child(_held_item)
 	_held_item.position = Vector2.ZERO
 	_held_item._velocity = Vector2.ZERO
+	if _held_item.type == "briefcase" and GameController.stage == 2:
+		GameController.game_over()
 
 func _drop_item() -> void:
+	if _held_item.type == "briefcase":
+		for i in rand_range(1, 3):
+			var paper = ItemScene.instance()
+			paper.type = "paper"
+			paper.gravity = 200
+			paper._velocity.y = -rand_range(150, 250)
+			if self._facing_direction == "right":
+				paper._velocity.x = rand_range(50, 100)
+			elif self._facing_direction == "left":
+				paper._velocity.x = -rand_range(50, 100)
+			self.get_parent().add_child(paper)
+			paper.position = _held_item.global_position
 	var held_item_pos := _held_item.global_position
 	_held_item.held = false
 	_hand.remove_child(_held_item)
@@ -81,7 +116,16 @@ func _drop_item() -> void:
 	_held_item.global_position = held_item_pos
 	_held_item = null
 	_held_item_parent = null
+	
 
 func _enter_door(door):
-	get_tree().change_scene_to(door.leads_to)
+	get_tree().change_scene(door.leads_to)
 
+func _switch_stage():
+	if _held_item.type == "briefcase":
+		_drop_item()
+	if _map_side == "right":
+		_map_side = "left"
+	elif _map_side == "left":
+		_map_side = "right"
+	get_tree().change_scene(GameController.starting_room)
