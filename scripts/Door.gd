@@ -1,6 +1,5 @@
 extends Node2D
 
-export var leads_to : String = ""
+export var exit_room_path := ""
+export var exit_door_name := ""
 
-func _ready():
-	pass # Replace with function body.

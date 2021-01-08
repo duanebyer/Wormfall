@@ -1,5 +1,7 @@
 extends Node2D
 
+
+##assign map side and starting location
 func _ready():
 	#First create ourself
 	var thisPlayer = preload("res://entities/OnlinePlayer.tscn").instance()

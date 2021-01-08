@@ -1,7 +1,9 @@
 extends KinematicBody2D
 
-const ItemScript := preload("res://scripts/Item.gd")
+const Item := preload("res://scripts/Item.gd")
 const ItemScene := preload("res://entities/Item.tscn")
+const PixelCamera := preload("res://scripts/PixelCamera.gd")
+const PixelCameraScene := preload("res://entities/PixelCamera.tscn")
 const Door := preload("res://scripts/Door.gd")
 
 export var gravity := 500.0
@@ -16,15 +18,21 @@ var _velocity := Vector2.ZERO
 
 onready var _area := $Area2D
 onready var _hand := $Hand
-var _held_item : ItemScript = null
+var _held_item : Item = null
 var _held_item_parent : Node2D = null
 
 var _map_side := "right"
 var _facing_direction := ""
 
+var player2_scene : String = "res://rooms/Test2.tscn"
+#var _briefcase_timer := Timer.new()
+
 
 func _ready() -> void:
-	pass
+	var camera : PixelCamera = PixelCameraScene.instance()
+	self.add_child(camera)
+	camera.current = true
+	
 
 func _physics_process(delta : float) -> void:
 	if !.is_on_floor():
@@ -65,19 +73,13 @@ func _process(_delta : float) -> void:
 		else: #use item
 			_held_item.use_item(_facing_direction)
 			_drop_item()
-			
-	if GameController.switch:
-		GameController.switch = false
-		_switch_stage()
-		
-	
 
 #think of a better way to do this prolly
 func collision_indices(collision_areas) -> Vector2:
 	var output = Vector2(-1, -1)
 	for i in collision_areas.size():
 		var collision : Node2D = collision_areas[i].get_parent()
-		if collision is ItemScript:
+		if collision is Item:
 			output.x = i
 		elif collision is Door:
 			output.y = i
@@ -93,8 +95,11 @@ func _pick_up_item(item) -> void:
 	_hand.add_child(_held_item)
 	_held_item.position = Vector2.ZERO
 	_held_item._velocity = Vector2.ZERO
-	if _held_item.type == "briefcase" and GameController.stage == 2:
-		GameController.game_over()
+	if _held_item.type == "briefcase":
+		if GameController.stage == 2:
+			GameController.game_over()
+		#else:
+		#	_briefcase_timer.start(rand_range(10, 30))
 
 func _drop_item() -> void:
 	if _held_item.type == "briefcase":
@@ -107,7 +112,7 @@ func _drop_item() -> void:
 				paper._velocity.x = rand_range(50, 100)
 			elif self._facing_direction == "left":
 				paper._velocity.x = -rand_range(50, 100)
-			self.get_parent().add_child(paper)
+			_held_item_parent.add_child(paper)
 			paper.position = _held_item.global_position
 	var held_item_pos := _held_item.global_position
 	_held_item.held = false
@@ -119,13 +124,18 @@ func _drop_item() -> void:
 	
 
 func _enter_door(door):
-	get_tree().change_scene(door.leads_to)
+	GameController.change_room(door)
 
-func _switch_stage():
-	if _held_item.type == "briefcase":
+
+func switch_stage():
+	if _held_item.type != null:
 		_drop_item()
 	if _map_side == "right":
 		_map_side = "left"
 	elif _map_side == "left":
 		_map_side = "right"
-	get_tree().change_scene(GameController.starting_room)
+
+
+func _notification(what):
+	if what == NOTIFICATION_PREDELETE:
+		print("AHHHHH")
